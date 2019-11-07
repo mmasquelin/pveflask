@@ -1,0 +1,13 @@
+proxmoxer>=1.0.3
+Click>=7.0
+Flask>=1.1.1
+itsdangerous>=1.1.0
+Jinja2>=2.10.3
+MarkupSafe>=1.1.1
+powerline-status>=2.7
+pync>=2.0.3
+python-dateutil>=2.8.1
+six>=1.13.0
+requests>=2.22.0
+Werkzeug>=0.16.0
+xmpppy>=0.5.0rc1
