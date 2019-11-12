@@ -30,3 +30,6 @@ class ProxmoxNode(FlaskForm):
         all_nodes.append(('all', 'All nodes'))
     node = SelectField('Nodes', choices=all_nodes)
     submit = SubmitField('Send')
+
+class VirtualMachine(object):
+    pass

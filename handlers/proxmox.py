@@ -1,3 +1,4 @@
+import json
 import requests
 from ..app import app
 from proxmoxer import ProxmoxAPI
@@ -11,6 +12,7 @@ def get_kvm_hosts(ct_node):
     for node in isc.nodes.get():
         for vm in isc.nodes(node['node']).qemu.get():
             print("{0}. {1} => {2}".format(vm['vmid'], vm['name'], vm['status']))
+    return None
 
 
 def get_lxc_hosts(ct_node):
@@ -18,18 +20,25 @@ def get_lxc_hosts(ct_node):
                      user=app.config["PROXMOX_USERNAME"] + '@' + app.config["PROXMOX_REALM"],
                      password=app.config["PROXMOX_PASSWORD"],
                      verify_ssl=False)
+    lxc_host_details = {}
 
     try:
+        nodes = []
         for node in isc.nodes.get():
             for vm in isc.nodes(node['node']).lxc.get():
+                pve_iface = []
                 for vmcfg in isc.nodes(node['node']).lxc(vm['vmid']).config.get():
-                    interfaces = []
                     if 'net' in vmcfg:
-                        mac = vmcfg
-                        ip = isc.nodes(node['node']).lxc(vm['vmid']).config.get()[mac]
-                        interfaces.append([mac, ip])
-                        print(
-                            f'{interfaces} | {node["node"]} - {vm["type"]} - id: {vm["vmid"]} | {vm["name"]} => {vm["status"]}')
+                        pve_iface_name = vmcfg
+                        pve_iface_details = isc.nodes(node['node']).lxc(vm['vmid']).config.get()[pve_iface_name]
+                        pve_iface.append({
+                            "pve_iface_name": pve_iface_name,
+                            "pve_iface_details": pve_iface_details
+                        })
+                nodes.append({
+                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'], "status": vm['status'], "network_info": pve_iface})
+        lxc_host_details.update({"status": "Host details", "vms": nodes})
+        return lxc_host_details
     except:
         pass
 
@@ -39,23 +48,33 @@ def get_openvz_hosts(ct_node):
                      user=app.config["PROXMOX_USERNAME"] + '@' + app.config["PROXMOX_REALM"],
                      password=app.config["PROXMOX_PASSWORD"],
                      verify_ssl=False)
+    openvz_host_details = {}
+
     try:
+        nodes = []
         for node in isc.nodes.get():
             for vm in isc.nodes(node['node']).openvz.get():
+                pve_iface = []
                 for vmcfg in isc.nodes(node['node']).openvz(vm['vmid']).config.get():
-                    interfaces = []
                     if 'net' in vmcfg:
-                        mac = vmcfg
-                        ip = isc.nodes(node['node']).openvz(vm['vmid']).config.get()[mac]
-                        interfaces.append([mac, ip])
-                        print(
-                            f'{interfaces} | {node["node"]} - {vm["type"]} - id: {vm["vmid"]} | {vm["name"]} => {vm["status"]}')
+                        pve_iface_name = vmcfg
+                        pve_iface_details = isc.nodes(node['node']).openvz(vm['vmid']).config.get()[pve_iface_name]
+                        pve_iface.append({
+                            "pve_iface_name": pve_iface_name,
+                            "pve_iface_details": pve_iface_details
+                        })
+                nodes.append({
+                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'], "network_info": pve_iface})
+        openvz_host_details.update({"status": "Host details", "vms": nodes})
+        return openvz_host_details
     except:
         pass
 
 
 @app.route('/list', methods=['GET'])
 def list_all_vms():
+    isc_details = {}
+    ct_nodes_details = []
     nodes = len(app.config["PROXMOX_CLUSTERS"])
     while 1:
         if nodes == 0:
@@ -84,8 +103,18 @@ def list_all_vms():
                 return "Error"
             else:
                 nodes -= 1
-                get_kvm_hosts(ct_node)
-                get_lxc_hosts(ct_node)
-                get_openvz_hosts(ct_node)
+                kvm_values = get_kvm_hosts(ct_node)
+                if kvm_values:
+                    ct_nodes_details.append({"ct_node_name": ct_node, "kvm_details": kvm_values})
+                    #print(ct_nodes_details)
+                lxc_values =  get_lxc_hosts(ct_node)
+                if lxc_values:
+                    ct_nodes_details.append({"ct_node_name": ct_node, "lxc_details": lxc_values})
+                    #print(ct_nodes_details)
+                openvz_values = get_openvz_hosts(ct_node)
+                if openvz_values:
+                    ct_nodes_details.append({"ct_node_name": ct_node, "openvz_details": openvz_values})
+                    #print(ct_nodes_details)
+                isc_details.update({"status": "Cluster details", "nodes": ct_nodes_details})
                 continue
-    return "Success"
+    return json.dumps(isc_details)
