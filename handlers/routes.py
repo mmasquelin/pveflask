@@ -43,8 +43,8 @@ def view_nodes():
 
 @app.route('/view/ssh', methods=['GET', 'POST'])
 def connect_to_openssh():
-    print(app.config['SSH_IP'])
     ssh = SSHClient(app.config['SSH_IP'], app.config['SSH_PORT'], app.config['SSH_USERNAME'], app.config['SSH_PASSWORD'])
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute('ls -al')
-    logger.info("Results:\n\tstd-in = {}\n\tstd-out = {}\n\tstd-err = {}".format(ssh_stdin, ssh_stdout, ssh_stderr))
+    print("Results:\n\tstd-in = {}\n\tstd-out = {}\n\tstd-err = {}".format(ssh_stdin, ssh_stdout, ssh_stderr))
     ssh.close()
+    return render_template('index.html')

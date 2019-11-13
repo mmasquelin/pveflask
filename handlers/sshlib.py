@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class SSHClient(object):
-    def __init__(self, ssh_host, ssh_username, ssh_password, ssh_port):
+    def __init__(self, ssh_host, ssh_port, ssh_username, ssh_password):
         self.connection = self.connect(ssh_host, ssh_port, ssh_username, ssh_password)
 
     def connect(self, ssh_host, ssh_port, ssh_username, ssh_password):
@@ -23,13 +23,17 @@ class SSHClient(object):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+        print('Hostname is: ' + socket.gethostbyname(ssh_host))
+
         try:
-            client.connect(hostname=ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
+            client.connect(socket.gethostbyname(ssh_host), port=22, username=ssh_username, password=ssh_password)
             logger.info("Connection created (host = {}, username = {}, password = *****)".format(ssh_host, ssh_username))
         except paramiko.AuthenticationException:
             logger.error("Authentication error")
-        except socket.error:
-            logger.error("Communication problem")
+        except paramiko.SSHException as sshException:
+            logger.error("Could not establish SSH connection: %s" % sshException)
+        except socket.timeout as e:
+            logger.error("Communication problem: %s" % e)
         except ValueError:
             logger.error("Connection failed")
 
