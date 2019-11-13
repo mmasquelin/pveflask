@@ -64,7 +64,7 @@ def get_openvz_hosts(ct_node):
                             "pve_iface_details": pve_iface_details
                         })
                 nodes.append({
-                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'], "network_info": pve_iface})
+                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'], "status": vm['status'], "network_info": pve_iface})
         openvz_host_details.update({"status": "Host details", "vms": nodes})
         return openvz_host_details
     except:
@@ -106,15 +106,12 @@ def list_all_vms():
                 kvm_values = get_kvm_hosts(ct_node)
                 if kvm_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "kvm_details": kvm_values})
-                    #print(ct_nodes_details)
                 lxc_values =  get_lxc_hosts(ct_node)
                 if lxc_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "lxc_details": lxc_values})
-                    #print(ct_nodes_details)
                 openvz_values = get_openvz_hosts(ct_node)
                 if openvz_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "openvz_details": openvz_values})
-                    #print(ct_nodes_details)
                 isc_details.update({"status": "Cluster details", "nodes": ct_nodes_details})
                 continue
     return json.dumps(isc_details)
