@@ -20,4 +20,9 @@ PROXMOX_PORT = 8006
 PROXMOX_USERNAME = "john.doe"
 PROXMOX_PASSWORD = "passw0rd"
 PROXMOX_REALM = "myrealm"
+
+SSH_USERNAME = '<my_ssh_authorized_user>'
+SSH_PASSWORD = 'a_password'
+SSH_PORT = 22 # Should be an integer
+SSH_IP = '192.168.xxx.xxx' # targeted hostname
 ```

@@ -23,8 +23,6 @@ class SSHClient(object):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        print('SSH hostname: ' + ssh_host)
-
         try:
             client.connect(hostname=ssh_host, port=ssh_port, username=ssh_username, password=ssh_password)
             logger.info("Connection created (host = {}, username = {}, password = *****)".format(ssh_host, ssh_username))
