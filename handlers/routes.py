@@ -48,8 +48,23 @@ def view_nodes():
     return render_template('nodes.html', title='Select node', form=form)
 
 
-@app.route('/view/ssh', methods=['GET', 'POST'])
-def connect_to_openssh():
+@app.route('/view/node/kernel_info', methods=['GET', 'POST'])
+def view_node_kernel():
     client = Connection(host=app.config['SSH_IP'], user=app.config['SSH_USERNAME'], port=app.config['SSH_PORT'], connect_kwargs={"password": app.config['SSH_PASSWORD']})
     result = client.run('uname -a')
+    return result.stdout.strip()
+
+@app.route('/view/node/tcp_connections', methods=['GET', 'POST'])
+def view_node_tcp_conn():
+    client = Connection(host=app.config['SSH_IP'], user=app.config['SSH_USERNAME'], port=app.config['SSH_PORT'], connect_kwargs={"password": app.config['SSH_PASSWORD']})
+    # r prefix is used to allow raw commands and avoid complex escaping sequences
+    command = r'''find /proc/ 2>/dev/null | grep tcp | grep -v task | grep -v sys/net | xargs grep -v rem_address 2>/dev/null | awk '{x=strtonum("0x"substr($3,index($3,":")-2,2)); y=strtonum("0x"substr($4,index($4,":")-2,2)); for (i=5; i>0; i-=2) x = x"."strtonum("0x"substr($3,i,2)); for (i=5; i>0; i-=2) y = y"."strtonum("0x"substr($4,i,2))}{printf ("%s\t:%s\t ----> \t %s\t:%s\t%s\n",x,strtonum("0x"substr($3,index($3,":")+1,4)),y,strtonum("0x"substr($4,index($4,":")+1,4)),$1)}' | sort | uniq --check-chars=25'''
+    result = client.run(command)
+    return result.stdout.strip()
+
+@app.route('/view/node/udp_connections', methods=['GET'])
+def view_node_udp_conn():
+    client = Connection(host=app.config['SSH_IP'], user=app.config['SSH_USERNAME'], port=app.config['SSH_PORT'], connect_kwargs={"password": app.config['SSH_PASSWORD']})
+    command = r'''find /proc/ 2>/dev/null | grep udp | grep -v task | grep -v sys/net | xargs grep -v rem_address 2>/dev/null | awk '{x=strtonum("0x"substr($3,index($3,":")-2,2)); y=strtonum("0x"substr($4,index($4,":")-2,2)); for (i=5; i>0; i-=2) x = x"."strtonum("0x"substr($3,i,2)); for (i=5; i>0; i-=2) y = y"."strtonum("0x"substr($4,i,2))}{printf ("%s\t:%s\t ----> \t %s\t:%s\t%s\n",x,strtonum("0x"substr($3,index($3,":")+1,4)),y,strtonum("0x"substr($4,index($4,":")+1,4)),$1)}' | sort | uniq --check-chars=25'''
+    result = client.run(command)
     return result.stdout.strip()
