@@ -1,4 +1,5 @@
 import json
+import re
 import requests
 from ..app import app
 from proxmoxer import ProxmoxAPI
@@ -36,7 +37,8 @@ def get_lxc_hosts(ct_node):
                             "pve_iface_details": pve_iface_details
                         })
                 nodes.append({
-                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'], "status": vm['status'], "network_info": pve_iface})
+                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'],
+                    "status": vm['status'], "network_info": pve_iface})
         lxc_host_details.update({"status": "Host details", "vms": nodes})
         return lxc_host_details
     except:
@@ -64,7 +66,8 @@ def get_openvz_hosts(ct_node):
                             "pve_iface_details": pve_iface_details
                         })
                 nodes.append({
-                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'], "status": vm['status'], "network_info": pve_iface})
+                    "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'],
+                    "status": vm['status'], "network_info": pve_iface})
         openvz_host_details.update({"status": "Host details", "vms": nodes})
         return openvz_host_details
     except:
@@ -72,7 +75,10 @@ def get_openvz_hosts(ct_node):
 
 
 @app.route('/list', methods=['GET'])
-def list_all_vms():
+def list_all_vms(cluster_node):
+    print('Selected cluster node is: ' + cluster_node)
+    if cluster_node == 'all':
+        print('Matches all for %s' % cluster_node)
     isc_details = {}
     ct_nodes_details = []
     nodes = len(app.config["PROXMOX_CLUSTERS"])
@@ -103,13 +109,16 @@ def list_all_vms():
                 return "Error"
             else:
                 nodes -= 1
-                kvm_values = get_kvm_hosts(ct_node)
+                kvm_values = None
+                # kvm_values = get_kvm_hosts(ct_node)
                 if kvm_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "kvm_details": kvm_values})
-                lxc_values =  get_lxc_hosts(ct_node)
+                lxc_values = None
+                # lxc_values =  get_lxc_hosts(ct_node)
                 if lxc_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "lxc_details": lxc_values})
-                openvz_values = get_openvz_hosts(ct_node)
+                openvz_values = None
+                # openvz_values = get_openvz_hosts(ct_node)
                 if openvz_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "openvz_details": openvz_values})
                 isc_details.update({"status": "Cluster details", "nodes": ct_nodes_details})

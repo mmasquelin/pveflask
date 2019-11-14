@@ -1,8 +1,8 @@
 import os
+from fabric import Connection
 from flask import flash, render_template, redirect, send_from_directory, url_for
 from .gui import LoginForm, ProxmoxNode
 from .proxmox import list_all_vms
-from .sshlib import SSHClient
 from ..app import app
 
 @app.route('/')
@@ -33,18 +33,23 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
+@app.route('/view/clusters', methods=['GET'])
+def get_cluster_details():
+    pass
+
+
 @app.route('/view/nodes', methods=['GET', 'POST'])
 def view_nodes():
     form = ProxmoxNode()
     if form.validate_on_submit():
-        return render_template('details.html', title='Selected node(s)', datas=list_all_vms())
+        # print(form.node.data)
+        return render_template('details.html', title='Selected node(s)', datas=list_all_vms(form.node.data))
+        # return render_template('details.html', title='Selected node(s)', datas=list_all_vms())
     return render_template('nodes.html', title='Select node', form=form)
 
 
 @app.route('/view/ssh', methods=['GET', 'POST'])
 def connect_to_openssh():
-    ssh = SSHClient(app.config['SSH_IP'], app.config['SSH_PORT'], app.config['SSH_USERNAME'], app.config['SSH_PASSWORD'])
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute('ls -al')
-    print("Results:\n\tstd-in = {}\n\tstd-out = {}\n\tstd-err = {}".format(ssh_stdin, ssh_stdout, ssh_stderr))
-    ssh.close()
-    return render_template('index.html')
+    client = Connection(host=app.config['SSH_IP'], user=app.config['SSH_USERNAME'], port=app.config['SSH_PORT'], connect_kwargs={"password": app.config['SSH_PASSWORD']})
+    result = client.run('uname -a')
+    return result.stdout.strip()

@@ -1,9 +1,5 @@
-import logging
 import paramiko
 import socket
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 class SSHClient(object):
@@ -23,7 +19,7 @@ class SSHClient(object):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        print('Hostname is: ' + socket.gethostbyname(ssh_host))
+        # print('Hostname is: ' + socket.gethostbyname(ssh_host))
 
         try:
             client.connect(socket.gethostbyname(ssh_host), port=22, username=ssh_username, password=ssh_password)
@@ -46,7 +42,7 @@ class SSHClient(object):
         :return: An output (stdout stream)
         """
         logger.debug("Executing command on stdout:\n\t{}".format(command.strip()))
-        return self.connection.exec_command(command.strip())
+        return self.connection.exec_command(command, timeout=10)
 
     def close(self):
         self.connection.close()

@@ -1,4 +1,5 @@
 paramiko>=2.6.0
+fabric>=2.5.0
 Flask-Bootstrap>=3.3.7.1
 Flask-WTF>=0.14.2
 wtforms>=2.2.1
