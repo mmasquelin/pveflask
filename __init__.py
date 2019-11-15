@@ -1,1 +1,1 @@
-from  .handlers import gui, proxmox, routes
+from  .handlers import gui, logging, proxmox, routes

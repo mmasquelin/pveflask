@@ -110,15 +110,15 @@ def list_all_vms(cluster_node):
             else:
                 nodes -= 1
                 kvm_values = None
-                # kvm_values = get_kvm_hosts(ct_node)
+                kvm_values = get_kvm_hosts(ct_node)
                 if kvm_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "kvm_details": kvm_values})
                 lxc_values = None
-                # lxc_values =  get_lxc_hosts(ct_node)
+                lxc_values =  get_lxc_hosts(ct_node)
                 if lxc_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "lxc_details": lxc_values})
                 openvz_values = None
-                # openvz_values = get_openvz_hosts(ct_node)
+                openvz_values = get_openvz_hosts(ct_node)
                 if openvz_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "openvz_details": openvz_values})
                 isc_details.update({"status": "Cluster details", "nodes": ct_nodes_details})
