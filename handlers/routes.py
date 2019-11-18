@@ -5,6 +5,7 @@ from flask import flash, render_template, redirect, send_from_directory, url_for
 from .gui import LoginForm, ProxmoxNode
 from .logging import get_logger
 from .proxmox import list_all_vms
+from .protocol import NetworkService
 from ..app import app
 
 logging = get_logger(__package__)
@@ -36,6 +37,12 @@ def login():
             form.username.data, form.remember_me.data))
         return redirect(url_for('view_nodes'))
     return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    service = NetworkService("http",80,"tcp","HTTP (HyperText Transfer Protocol)")
+    return service.__str__()
 
 
 @app.route('/view/clusters', methods=['GET'])
