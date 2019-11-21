@@ -6,6 +6,68 @@ from proxmoxer import ProxmoxAPI
 from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 
 
+class VM(object):
+    '''
+    The VM class allows to define a VM with tons of properties
+    '''
+    name = None
+    vm_type = None
+    vmid = -1
+    node = None
+    description = None
+    status = "unknown"
+    network_info = None
+
+    def __init__(self, name=name, vm_type=vm_type, vmid=vmid, network_info=network_info, status=status, node=node,
+                 description=description):
+        self.name = name
+        self.vm_type = vm_type
+        self.vmid = vmid
+        self.network_info = network_info
+        self.status = status
+        self.node = node
+        self.description = description
+
+    def __str__(self):
+        return 'VM(node=' + str(self.node) + ', vmid=' + str(self.vmid) + ', name=' + str(
+            self.name) + ', status=' + self.status + ')'
+
+
+class NetworkInterface(object):
+    '''
+    The NetworkInterface class allows to specify network details for a VM
+    '''
+    name = "net0"
+    internal_name = "eth0"
+    bridge = "vmbr0"
+    hwaddr = "FF:FF:FF:FF:FF:FF"
+    ip = "dhcp"
+    type = "veth"
+    vm = None
+    description = "Primary network interface"
+
+    def __init__(self, name=name, internal_name=internal_name, bridge=bridge, hwaddr=hwaddr, ip=ip, type=type, vm=vm,
+                 description=description):
+        self.name = name
+        self.internal_name = internal_name
+        self.bridge = bridge
+        self.hwaddr = hwaddr
+        self.ip = ip
+        self.type = type
+        self.vm = vm
+        self.description = description
+
+    def __str__(self):
+        return 'NetworkInterface(name=' + self.internal_name + ', ip=' + self.ip + ', hwaddr=' + self.hwaddr + ')'
+
+    def set_interface_details(self, pve_vm, pve_iface_name, pve_iface_details):
+        cur_iface_details = dict(x.split('=') for x in pve_iface_details.split(','))
+        return NetworkInterface(internal_name=pve_iface_name, name=str(cur_iface_details['name']),
+                                ip=str(cur_iface_details['ip']), hwaddr=str(cur_iface_details['hwaddr']),
+                                bridge=str(cur_iface_details['bridge']), type=str(cur_iface_details['type']), vm=pve_vm,
+                                description=str(None), )
+
+
 def get_kvm_hosts(ct_node):
     isc = ProxmoxAPI(host=ct_node, port=app.config["PROXMOX_PORT"],
                      user=app.config["PROXMOX_USERNAME"] + '@' + app.config["PROXMOX_REALM"],
