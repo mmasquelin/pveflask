@@ -4,8 +4,8 @@ from fabric import Connection
 from flask import flash, render_template, redirect, send_from_directory, url_for
 from .gui import LoginForm, ProxmoxNode
 from .logging import get_logger
-from .proxmox import list_all_vms
-from .protocol import NetworkService
+from .proxmox import NetworkInterface, VM, list_all_vms
+from .services import NetworkService
 from ..app import app
 
 logging = get_logger(__package__)
@@ -42,6 +42,12 @@ def login():
 @app.route('/test', methods=['GET'])
 def test():
     service = NetworkService("http",80,"tcp","HTTP (HyperText Transfer Protocol)")
+    try:
+        details = "name=eth1,bridge=vmbr3,hwaddr=1E:8C:0E:6B:04:9F,ip=dhcp,type=veth"
+        interface = NetworkInterface().set_interface_details("test","net0", details)
+        print(interface)
+    except ValueError as v:
+        logging.error('Erreur')
     return service.__str__()
 
 

@@ -6,7 +6,7 @@ LOGGERS = []
 
 logging.basicConfig(
     format='%(asctime)s : %(levelname)-16s %(name)-32s %(message)-32s',
-    filename="/dev/null",
+    filename="journal.log",
     level=logging.DEBUG
 )
 logging.config.dictConfig({

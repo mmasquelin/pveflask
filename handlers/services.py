@@ -8,7 +8,7 @@ class NetworkService(object):
     transport_protocol = None
     description = None
 
-    def __init__(self, name, port, transport_protocol, description):
+    def __init__(self, name=name, port=port, transport_protocol=transport_protocol, description=description):
         self.name = name
         self.port = port
         self.transport_protocol = transport_protocol
@@ -35,7 +35,7 @@ class NetworkService(object):
         return (self.port == 21 and self.transport_protocol == "tcp") or (self.port == 21 and self.transport_protocol == "udp")
 
     def is_ssh(self):
-        return self.port == 22 and self.transport_protocol == "tcp"
+        return (self.port == 22 and self.transport_protocol == "tcp") or (self.port == 22 and self.transport_protocol == "udp") or (self.port == 22 and self.transport_protocol == "sctp")
 
     def is_telnet(self):
         return (self.port == 23 and self.transport_protocol == "tcp") or (self.port == 23 and self.transport_protocol == "udp")
@@ -46,5 +46,23 @@ class NetworkService(object):
     def is_http(self):
         return self.port == 80 and self.transport_protocol == "tcp"
 
+    def is_sunrpc(self):
+        return (self.port == 111 and self.transport_protocol == "tcp") or (self.port == 111 and self.transport_protocol == "udp")
+
+    def is_imap(self):
+        return (self.port == 143 and self.transport_protocol == "tcp") or (self.port == 143 and self.transport_protocol == "udp")
+
+    def is_ldap(self):
+        return (self.port == 389 and self.transport_protocol == "tcp") or (self.port == 389 and self.transport_protocol == "udp")
+
     def is_https(self):
         return self.port == 443 and self.transport_protocol == "tcp"
+
+    def is_rndc(self):
+        return self.port == 953 and self.transport_protocol == "tcp"
+
+    def is_sieve(self):
+        return (self.port == 4190 and self.transport_protocol == "tcp")
+
+    def is_sunproxyadmin(self):
+        return (self.port == 8081 and self.transport_protocol == "tcp") or (self.port == 8081 and self.transport_protocol == "udp")

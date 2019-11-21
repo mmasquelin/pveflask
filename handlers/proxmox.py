@@ -98,6 +98,8 @@ def get_lxc_hosts(ct_node):
                             "pve_iface_name": pve_iface_name,
                             "pve_iface_details": pve_iface_details
                         })
+                        interface = NetworkInterface().set_interface_details(pve_vm=isc.nodes(node['node']).lxc(vm['name']), pve_iface_name=vmcfg, pve_iface_details=isc.nodes(node['node']).lxc(vm['vmid']).config.get()[pve_iface_name])
+                        print(interface)
                 nodes.append({
                     "node": node['node'], "vmid": vm['vmid'], "type": vm['type'], "name": vm['name'],
                     "status": vm['status'], "network_info": pve_iface})
@@ -176,7 +178,7 @@ def list_all_vms(cluster_node):
                 if kvm_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "kvm_details": kvm_values})
                 lxc_values = None
-                lxc_values =  get_lxc_hosts(ct_node)
+                lxc_values = get_lxc_hosts(ct_node)
                 if lxc_values:
                     ct_nodes_details.append({"ct_node_name": ct_node, "lxc_details": lxc_values})
                 openvz_values = None
