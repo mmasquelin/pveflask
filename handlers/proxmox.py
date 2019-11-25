@@ -7,9 +7,9 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException, Ti
 
 
 class VM(object):
-    '''
+    """
     The VM class allows to define a VM with tons of properties
-    '''
+    """
     name = None
     vm_type = None
     vmid = -1
@@ -20,6 +20,7 @@ class VM(object):
 
     def __init__(self, name=name, vm_type=vm_type, vmid=vmid, network_info=network_info, status=status, node=node,
                  description=description):
+        '''Initialize the object VM'''
         self.name = name
         self.vm_type = vm_type
         self.vmid = vmid
@@ -34,9 +35,9 @@ class VM(object):
 
 
 class NetworkInterface(object):
-    '''
+    """
     The NetworkInterface class allows to specify network details for a VM
-    '''
+    """
     name = "net0"
     internal_name = "eth0"
     bridge = "vmbr0"
@@ -67,8 +68,13 @@ class NetworkInterface(object):
                                 bridge=str(cur_iface_details['bridge']), type=str(cur_iface_details['type']), vm=pve_vm,
                                 description=str(None), )
 
+    def to_json(self):
+    '''
+    This is a serializer method, return a JSON serialized class object
+    '''
 
-def get_kvm_hosts(ct_node):
+
+ get_kvm_hosts(ct_node):
     isc = ProxmoxAPI(host=ct_node, port=app.config["PROXMOX_PORT"],
                      user=app.config["PROXMOX_USERNAME"] + '@' + app.config["PROXMOX_REALM"],
                      password=app.config["PROXMOX_PASSWORD"], verify_ssl=False)
