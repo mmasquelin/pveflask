@@ -8,9 +8,8 @@
 
         {{ node_name }}
 
-        {{ datas }}
+        {% for vm in datas.vms %}
 
-        {% for vm in datas %}
             <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -21,9 +20,9 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>{{ vm['machine'] }}</td>
-                    <td>{{ vm[1] }}</td>
-                    <td>{{ vm[2] }}</td>
+                    <td>{{ vm.name }}</td>
+                    <td>{{ vm.network_info }}</td>
+                    <td>{{ vm.status }}</td>
                 </tr>
             </tbody>
             </table>

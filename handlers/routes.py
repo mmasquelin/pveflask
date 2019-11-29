@@ -62,8 +62,8 @@ def view_clusters():
 
 @app.route('/view/node/<node_name>', methods=['GET'])
 def view_node(node_name):
+    logging.debug(node_name)
     return render_template('node_details.html', title='Node content details', node_name=node_name, datas=json.loads(view_lxc_hosts(node_name)))
-
 
 @app.route('/view/node/kernel_info', methods=['GET', 'POST'])
 def view_node_kernel():

@@ -70,8 +70,9 @@ class PVENode(object):
     node_name = None
     ipv4 = "127.0.0.1/32"
     description = None
+    vms = []
 
-    def __init__(self, node_name=node_name, ipv4=ipv4, description=description, parent=None):
+    def __init__(self, node_name=node_name, ipv4=ipv4, description=description, parent=None, vms=vms):
         """
         Initialize the object PVE cluster
         :param name:
@@ -81,6 +82,7 @@ class PVENode(object):
         self.node_name = node_name
         self.ipv4 = ipv4
         self.description = description
+        self.vms = vms
 
     def __str__(self):
         return 'PVE_Node(node_name=' + str(self.node_name) + ', ip_address=' + str(self.ipv4) + ')'
@@ -169,16 +171,31 @@ def get_kvm_hosts(ct_node):
 
 
 def view_lxc_hosts(ct_node):
-    logging.debug('Calling view_lxc_host method for ' + ct_node)
+    try:
+        my_node = PVENode(node_name=ct_node).__dict__
+    except:
+        pass
+    logging.debug('Selected node is: ' + ct_node)
     isc = ProxmoxAPI(host=ct_node, port=app.config["PROXMOX_PORT"],
                      user=app.config["PROXMOX_USERNAME"] + '@' + app.config["PROXMOX_REALM"],
                      password=app.config["PROXMOX_PASSWORD"],
                      verify_ssl=False)
-    machines = []
-    for vm in isc.nodes(ct_node).lxc.get():
-        machines.append({"machine": VM(name=vm['name'], vm_type=vm['type'], vmid=vm['vmid'], status=vm['status'], node=ct_node).to_json()})
-    logging.debug(machines)
-    return json.dumps(machines)
+    try:
+        for vm in isc.nodes(ct_node).lxc.get():
+            my_node['vms'].append(VM(name=vm['name'], vm_type=vm['type'], vmid=vm['vmid'], status=vm['status'], node=ct_node).__dict__)
+    except:
+        pass
+    try:
+        for vm in isc.nodes(ct_node).openvz.get():
+            my_node['vms'].append(VM(name=vm['name'], vm_type=vm['type'], vmid=vm['vmid'], status=vm['status'], node=ct_node).__dict__)
+    except:
+        pass
+    try:
+        for vm in isc.nodes(ct_node).qemu.get():
+            my_node['vms'].append(VM(name=vm['name'], vm_type='kvm', vmid=vm['vmid'], status=vm['status'], node=ct_node).__dict__)
+    except:
+        pass
+    return json.dumps(my_node)
 
 def get_lxc_hosts(ct_node):
     logging.debug('Calling get_lxc_host method for ' + ct_node)
