@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Node details</h1>
+
+    {% if node_name is not none %}
+
+        {{ node_name }}
+
+        {{ datas }}
+
+        {% for vm in datas %}
+            <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Node name</th>
+                    <th>IP</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ vm['machine'] }}</td>
+                    <td>{{ vm[1] }}</td>
+                    <td>{{ vm[2] }}</td>
+                </tr>
+            </tbody>
+            </table>
+        {% endfor %}
+
+    {% endif %}
+
+{% endblock %}

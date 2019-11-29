@@ -15,19 +15,19 @@ logging.config.dictConfig({
 })
 
 
-def get_logger(package, compenent="/"):
+def get_logger(package, component="/"):
     from config_app import LOGGING
     logger = logging.getLogger(package)
-    if f'{package}{compenent}' not in LOGGERS:
+    if f'{package}{component}' not in LOGGERS:
         logger.handlers.clear()
         handler = logging.StreamHandler(sys.stdout)
-        compenent = compenent + \
-            ''.join([" " for _ in range(24-len(compenent))])
+        component = component + \
+            ''.join([" " for _ in range(24 - len(component))])
         formatter = logging.Formatter(
-            f'%(asctime)s : %(levelname)-12s %(name)-24s  {compenent} %(message)-24s')
+            f'%(asctime)s : %(levelname)-12s %(name)-24s  {component} %(message)-24s')
         handler.setFormatter(formatter)
         if LOGGING:
             logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
-        LOGGERS.append(f'{package}{compenent}')
+        LOGGERS.append(f'{package}{component}')
     return logger

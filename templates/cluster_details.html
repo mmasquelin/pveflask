@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>PVE cluster details</h1>
+
+    {% if datas.cluster_name is not none %}
+
+        <a href="{{ url_for('.view_node', node_name='all') }}">{{ datas.cluster_name }}</a>
+
+    {% for cluster in datas.cluster_nodes %}
+        <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Node name</th>
+                <th>IP</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="{{ url_for('.view_node', node_name=cluster.node_name) }}">{{ cluster.node_name }}</a></td>
+                <td>{{ cluster.ipv4 }}</td>
+                <td>{{ cluster.description }}</td>
+            </tr>
+        </tbody>
+        </table>
+    {% endfor %}
+
+    {% endif %}
+
+{% endblock %}

@@ -1,10 +1,11 @@
 import os
 import json
 from fabric import Connection
-from flask import flash, render_template, redirect, send_from_directory, url_for
-from .gui import LoginForm, ProxmoxNode
+from flask import flash, render_template, redirect, send_from_directory, url_for, json, request
+from .gui import LoginForm, ProxmoxNode, ProxmoxCluster
+from .common import is_word_in_text
 from .logging import get_logger
-from .proxmox import NetworkInterface, VM, list_all_vms
+from .proxmox import NetworkInterface, VM, list_all_vms, get_lxc_hosts, view_lxc_hosts
 from .services import NetworkService
 from ..app import app
 
@@ -51,19 +52,17 @@ def test():
     return service.__str__()
 
 
-@app.route('/view/clusters', methods=['GET'])
-def get_cluster_details():
-    pass
-
-
-@app.route('/view/nodes', methods=['GET', 'POST'])
-def view_nodes():
-    form = ProxmoxNode()
+@app.route('/view/clusters', methods=['GET', 'POST'])
+def view_clusters():
+    form = ProxmoxCluster()
     if form.validate_on_submit():
-        # print(form.node.data)
-        return render_template('details.html', title='Selected node(s)', datas=list_all_vms(form.node.data))
-        # return render_template('details.html', title='Selected node(s)', datas=list_all_vms())
-    return render_template('nodes.html', title='Select node', form=form)
+        return render_template('cluster_details.html', title='Selected node(s)', datas=json.loads(list_all_vms()))
+    return render_template('clusters.html', title='Select node', form=form)
+
+
+@app.route('/view/node/<node_name>', methods=['GET'])
+def view_node(node_name):
+    return render_template('node_details.html', title='Node content details', node_name=node_name, datas=json.loads(view_lxc_hosts(node_name)))
 
 
 @app.route('/view/node/kernel_info', methods=['GET', 'POST'])

@@ -28,13 +28,25 @@ class ProxmoxNode(FlaskForm):
         node = ('' + node.partition('.')[0] + '','' + node + '')
         all_nodes.append(node)
     if app.config['PROXMOX_CLUSTERS']:
-        all_nodes.append(('all', 'All nodes'))
+        all_nodes.append(('all', 'All clusters'))
     node = SelectField('Nodes', choices=all_nodes)
     submit = SubmitField('Send')
 
 
 class ProxmoxCluster(FlaskForm):
-    pass
+    '''
+        The Proxmox FlaskForm contains lots of PVE clusters
+        '''
+    # all_nodes = [('none', 'None')]
+    all_nodes = []
+    for node in app.config['PROXMOX_CLUSTERS']:
+        node = ('' + node.partition('.')[0] + '', '' + node + '')
+        all_nodes.append(node)
+    if app.config['PROXMOX_CLUSTERS']:
+        all_nodes.append(('all', 'All clusters'))
+    node = SelectField('Nodes', choices=all_nodes)
+    submit = SubmitField('Send')
+
 
 class VirtualMachine(object):
     pass
