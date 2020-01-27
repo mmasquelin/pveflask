@@ -150,11 +150,14 @@ class NetworkInterface(object):
         return 'NetworkInterface(name=' + self.internal_name + ', ip=' + self.ip + ', hwaddr=' + self.hwaddr + ')'
 
     def set_interface_details(self, pve_vm, pve_iface_name, pve_iface_details):
+        #logging.debug('Calling method set_interface_details')
+        #logging.debug(pve_iface_name)
         cur_iface_details = dict(x.split('=') for x in pve_iface_details.split(','))
+
         return NetworkInterface(internal_name=pve_iface_name, name=str(cur_iface_details['name']),
                                 ip=str(cur_iface_details['ip']), hwaddr=str(cur_iface_details['hwaddr']),
                                 bridge=str(cur_iface_details['bridge']), type=str(cur_iface_details['type']), vm=pve_vm,
-                                description=str(None), )
+                                description=str(None))
 
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -170,19 +173,30 @@ def get_kvm_hosts(ct_node):
     return None
 
 
-def view_lxc_hosts(ct_node):
-    try:
-        my_node = PVENode(node_name=ct_node).__dict__
-    except:
-        pass
+def view_node_details(ct_node):
+    my_node = PVENode(node_name=ct_node).__dict__
+
+    if my_node['vms']:
+        my_node['vms'].clear()
+    else:
+        logging.debug('VM list is empty')
+
     logging.debug('Selected node is: ' + ct_node)
     isc = ProxmoxAPI(host=ct_node, port=app.config["PROXMOX_PORT"],
                      user=app.config["PROXMOX_USERNAME"] + '@' + app.config["PROXMOX_REALM"],
                      password=app.config["PROXMOX_PASSWORD"],
                      verify_ssl=False)
+
     try:
         for vm in isc.nodes(ct_node).lxc.get():
-            my_node['vms'].append(VM(name=vm['name'], vm_type=vm['type'], vmid=vm['vmid'], status=vm['status'], node=ct_node).__dict__)
+            interfaces = []
+            logging.debug(interfaces)
+            for vmcfg in isc.nodes(ct_node).lxc(vm['vmid']).config.get():
+                if 'net' in vmcfg:
+                    pve_iface_name = vmcfg
+                    pve_iface_details = isc.nodes(ct_node).lxc(vm['vmid']).config.get()[pve_iface_name]
+                    interface = NetworkInterface().set_interface_details(pve_vm=vm['name'],pve_iface_name=pve_iface_name,pve_iface_details=pve_iface_details).__dict__
+            my_node['vms'].append(VM(name=vm['name'], vm_type=vm['type'], vmid=vm['vmid'], status=vm['status'], node=ct_node, network_info=interface).__dict__)
     except:
         pass
     try:

@@ -243,3 +243,6 @@ pip-selfcheck.json
 
 ### Config files ###
 config_app.py
+
+### Journal files ###
+journal.log

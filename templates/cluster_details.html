@@ -6,7 +6,9 @@
 
     {% if datas.cluster_name is not none %}
 
-        <a href="{{ url_for('.view_node', node_name='all') }}">{{ datas.cluster_name }}</a>
+        <p>
+            Cluster entrypoint: <a href="{{ url_for('.view_node', node_name='all') }}">{{ datas.cluster_name }}</a>
+        </p>
 
     {% for cluster in datas.cluster_nodes %}
         <table class="table table-bordered table-striped">

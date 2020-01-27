@@ -6,7 +6,9 @@
 
     {% if node_name is not none %}
 
-        {{ node_name }}
+        <p>
+            Node entrypoint: {{ node_name }}
+        </p>
 
         {% for vm in datas.vms %}
 
@@ -21,7 +23,7 @@
             <tbody>
                 <tr>
                     <td>{{ vm.name }}</td>
-                    <td>{{ vm.network_info }}</td>
+                    <td>{{ vm.network_info.ip }}</td>
                     <td>{{ vm.status }}</td>
                 </tr>
             </tbody>

@@ -5,7 +5,7 @@ from flask import flash, render_template, redirect, send_from_directory, url_for
 from .gui import LoginForm, ProxmoxNode, ProxmoxCluster
 from .common import is_word_in_text
 from .logging import get_logger
-from .proxmox import NetworkInterface, VM, list_all_vms, get_lxc_hosts, view_lxc_hosts
+from .proxmox import NetworkInterface, VM, list_all_vms, get_lxc_hosts, view_node_details
 from .services import NetworkService
 from ..app import app
 
@@ -63,7 +63,8 @@ def view_clusters():
 @app.route('/view/node/<node_name>', methods=['GET'])
 def view_node(node_name):
     logging.debug(node_name)
-    return render_template('node_details.html', title='Node content details', node_name=node_name, datas=json.loads(view_lxc_hosts(node_name)))
+    return render_template('node_details.html', title='Node content details', node_name=node_name, datas=json.loads(
+        view_node_details(node_name)))
 
 @app.route('/view/node/kernel_info', methods=['GET', 'POST'])
 def view_node_kernel():
